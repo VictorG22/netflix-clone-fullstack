@@ -1,17 +1,19 @@
 import { Play } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import { tmdbOptions } from "../utils/api";
-
-
 
 const MoviePage = () => {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
+  const [trailerKey, setTrailerKey] = useState(null);
 
   useEffect(() => {
-    fetch(`https://api.themoviedb.org/3/movie/${id}?language=en-US`, tmdbOptions)
+    fetch(
+      `https://api.themoviedb.org/3/movie/${id}?language=en-US`,
+      tmdbOptions
+    )
       .then((res) => res.json())
       .then((res) => setMovie(res))
       .catch((err) => console.error(err));
@@ -23,15 +25,26 @@ const MoviePage = () => {
       .then((res) => res.json())
       .then((res) => setRecommendations(res.results || []))
       .catch((err) => console.error(err));
+
+    fetch(
+      `https://api.themoviedb.org/3/movie/${id}/videos?language=en-US`,
+      tmdbOptions
+    )
+      .then((res) => res.json())
+      .then((res) => {
+        const trailer = res.results?.find((video) => video.site === "YouTube" && video.type === "Trailer")
+        setTrailerKey(trailer?.key || null);
+      })
+      .catch((err) => console.error(err));
   }, [id]);
 
   if (!movie) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <h1 className="text-xl text-red-500">Loading...</h1>      </div>
+        <h1 className="text-xl text-red-500">Loading...</h1>{" "}
+      </div>
     );
   }
-
 
   return (
     <div className="min-h-screen bg-[#181818] text-white">
@@ -48,11 +61,12 @@ const MoviePage = () => {
         <div className="relative z-10 flex items-end p-8 gap-8">
           <img
             src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-            className="rounded-lg shadow-lg w-48 hidden md:block"
+            className=" rounded-lg shadow-lg w-48 hidden md:block"
             alt={movie.title}
           />
           <div>
-            <h1 className="text-4xl font-bold mb-2">{movie.title}</h1>            <div className="flex items-center gap-4 mb-2">
+            <h1 className="text-4xl font-bold mb-2">{movie.title}</h1>{" "}
+            <div className="flex items-center gap-4 mb-2">
               <span>IMDb Rating: ⭐ {movie.vote_average?.toFixed(1)}</span>
               <span> Release Date: {movie.release_date}</span>
               <span>Movie Runtime: {movie.runtime} mins</span>
@@ -68,14 +82,16 @@ const MoviePage = () => {
               ))}
             </div>
             <p className="max-w-2xl text-gray-200 mb-4">{movie.overview}</p>
+            <Link to={`https://www.youtube.com/watch?v=${trailerKey}`} target="_blank">
             <button
               className="flex justify-center items-center border-2  bg-[#e50914]
-           hover:bg-white hover:text-[#e50914] text-white py-3 px-4 rounded-full cursor-pointer text-sm md:text-base
-          transition duration-300"
-            >
+              hover:bg-white hover:text-[#e50914] text-white py-3 px-4 rounded-full cursor-pointer text-sm md:text-base
+              transition duration-300"
+              >
               <Play className="mr-2 w-4 h-5 md:w-5 md:h-5" />
               Watch Now
             </button>
+              </Link>
           </div>
         </div>
       </div>
@@ -155,9 +171,35 @@ const MoviePage = () => {
       </div>
       {recommendations.length > 0 ? (
         <div className="p-8">
-          <h2 className="text-2xl font-semibold mb-4">You might also like...</h2>
+          <h2 className="text-2xl font-semibold mb-4">
+            You might also like...
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 ">
+            {recommendations.slice(0, 10).map((rec) => (
+              <div
+                className="max-w-[300px] bg-[#232323] rounded-lg overflow-hidden hover:scale-105 transition"
+                key={rec.id}
+              >
+                <Link to={`/movie/${rec.id}`}>
+                  <img
+                    className=""
+                    src={`https://image.tmdb.org/t/p/w300${rec.poster_path}`}
+                    alt={rec.title}
+                  />
+                  <div className="p-2">
+                    <h3 className="text-sm font-semibold">{rec.title}</h3>
+                    <span className="text-xs text-gray-400">
+                      {rec.release_date?.slice(0, 4) || "N/A"}
+                    </span>
+                  </div>
+                </Link>
+              </div>
+            ))}
+          </div>
         </div>
-      ) : "No recommendations"}
+      ) : (
+        "No recommendations"
+      )}
     </div>
   );
 };

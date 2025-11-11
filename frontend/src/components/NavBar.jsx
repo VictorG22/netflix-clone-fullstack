@@ -24,8 +24,10 @@ const NavBar = () => {
           <input type="text" className="bg-[#333333] px-4 py-2 rounded-full" placeholder="Search..." />
           <Search className="absolute top-2 right-4 w-5 h-5"/>
         </div>
-        <button className="bg-[#e50914] px-5 py-2 text-white cursor-pointer rounded-4xl transform hover:-translate-y-1 hover:bg-white hover:text-[#e50914] transition duration-300">Get AI Movie Picks</button>
+        <button className="bg-[#e50914] px-5 py-2 text-white cursor-pointer rounded-4xl hover:scale-105 hover:bg-white hover:text-[#e50914] transition duration-300">Get AI Movie Picks</button>
+        <Link to={'/signin'}>
         <button className="border border-[#333333] px-4 py-2 cursor-pointer">Sign In</button>
+        </Link>
       </div>
     </nav>
   );

@@ -1,6 +1,6 @@
 const Footer = () => {
   return (
-    <div className="px-5 text-[#737373] md:px-10">
+    <div className="px-5 pt-5 text-[#737373] md:px-10">
       <p className="pb-5">Questions? Contact Us</p>
 
       <hr />

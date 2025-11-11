@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { tmdbOptions } from "../utils/api";
 
-console.log("Hello")
 
 const Hero = () => {
   const [movie, setMovie] = useState(null);
